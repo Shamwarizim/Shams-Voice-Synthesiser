@@ -1,0 +1,86 @@
+Reminder: When finished, make a version of this list which goes over every sound required for a full, deluxe voice.
+
+==================================================================================================================
+✅BLENDS
+Note: A blend is a sound like the "bl" in blend. Two letters make their own sounds but together.
+
+	To not bloat necessary recordings we can ignore blends as they don't represent a new sound.
+	Therefore, playing the letter sounds separately works well enough.
+
+==================================================================================================================
+❌GRAPHEMES (ALPHABET)
+Note: It's very easy to add an 'uh' sound to the end of consonants like B becoming buh, or D to duh. So you must ensure you do not add extra sounds to the end or the resulting voice will sound bad. Also, make sure each letter is pronounced quickly. If it's too long, words will sound weird.
+
+    ✅a ("ah" not long "ay")
+    ✅b
+    ✅(C is not used as it is identical to K)
+    ✅d
+    ✅e ("eh" not long "ee")
+    ✅f
+    ✅g
+    ✅h
+    ✅i ("ih" not long "I")
+    ✅j
+    ✅k
+    ✅l
+    ✅m
+    ✅n
+    ✅o ("oh" not long "oa")
+    ✅p
+    ✅q ("kw") [OPTIONAL: as q is a blend of the k and w sounds. But cos it's a letter, it excepts the no blend files rule.]
+    ✅r
+    ✅s
+    ✅t
+    ✅u ("uh" not long "ue")
+    ✅v
+    ✅w
+    ✅x ("ks") [OPTIONAL: as x is a blend of the k and s sounds. But cos it's a letter, it excepts the no blend files rule.]
+    ✅y ("yuh"-esque sound not a "ee")
+    ✅z
+
+==================================================================================================================
+❌DIGRAPHS
+
+	RECORDINGS NEEDED (but have fallback logic to sound each letter if digraph sound not provided)
+        VOWELS
+        ay
+        ee
+        oa
+
+        OTHER
+        sh
+        ch
+        th
+        ng
+        oo (as in too not book. as that just sounds better when used in incorrect circumstances rather than vice versa)
+        er
+        oi
+        or / oar
+	
+	PURE LOGIC NEEDED (no extra recordings as these make sounds already in the alphabet)
+        ph -> f
+        qu -> q (where q is kw)
+        ce -> s-e
+        ci -> s-i
+        cy -> s-ee
+        any double letter -> pronounce just once (exclu oo and ee)
+        ui -> oo
+        ue -> oo
+
+==================================================================================================================
+❌SILENT
+
+	PURE LOGIC
+        ng -> n (FALLBACK for if no ng sound provided)
+        wh - w
+        ck -> k
+        kn -> n
+        wr -> r
+        mb (end) -> m
+        bt (end) -> t
+        dge (end) -> j
+        gn -> n
+        mn (end) -> n
+        ea -> e (theres like 4 different eas but the one that sounds the 'best' in all situations is e)
+	
+	

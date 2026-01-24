@@ -1,3 +1,7 @@
 TO DO
+- finish graphemes
+    ‼️ rewrite the dict generator to be tailored to the sound needs. so go thru the graphemes, sub c for k sound, etc ‼️
+    - move silences into the dictionary
+
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
 - make a mode where it can speak each character LIVE so you can run text integration

@@ -1,6 +1,6 @@
 # robot voice sourced from: https://evolution.voxeo.com/library/audio/prompts/alphabet/index.jsp
 
-# pip install pydub
+# python3 -m pip install pydub
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
 from pydub.effects import speedup
@@ -9,13 +9,16 @@ log.basicConfig(format="[%(asctime)s] [%(filename)s/%(levelname)s]: %(message)s 
                     datefmt="%H:%M:%S",
                     level=log.DEBUG)
 log.getLogger("pydub").setLevel(log.ERROR)
+#DEBUG > INFO > WARNING > ERROR > CRITICAL
 import os
+from pathlib import Path
+import string
 
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
-VOICE_FOLDER = 'sham'
+VOICE_FOLDER = 'sham_all'
 INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.'
 
 
@@ -39,37 +42,66 @@ def strip_silence(audio: AudioSegment) -> AudioSegment:
 
 
 # GENERATE SOUNDS DICTIONARY
-def gen_dict(voices_path, voice_folder):
+def gen_sound_dict(voices_path, voice_folder):
     sound_dict = {}
 
-    voice_path = os.path.join(voices_path, voice_folder)
-    for file in os.listdir(voice_path):
-        # Get sound name (eg letter) and file type (eg mp3)
-        path = os.path.join(voice_path, file)
-        if os.path.isfile(path):
-            sound_name, file_extension = os.path.splitext(file)
-            file_type = file_extension[1:]
+    ##voice_path = os.path.join(voices_path, voice_folder)
+    voice_path = Path(voices_path) / voice_folder
+    # GRAPHEMES (alphabet)
+    for letter in string.ascii_lowercase:
+        # c uses the k sound.
+        if letter == 'c':
+            audio_file = next(voice_path.glob(f"k.*"), None)
 
-        try:
-            loader = getattr(AudioSegment, f"from_{file_type}")
-        except AttributeError:
-            raise ValueError(f"Unsupported audio format: {file_type}")
-        audio = loader(path) # where loader is something like AudioSegment.from_mp3, from_wav, etc
+        # Everything but c.
+        else:
+            audio_file = next(voice_path.glob(f"{letter}.*"), None) # grabs first item from glob search
 
-        audio = strip_silence(audio)
-        sound_dict[sound_name] = audio
-    
+        # Grab and clean audio if found.
+        if audio_file:
+            audio = AudioSegment.from_file(audio_file)
+            audio = strip_silence(audio)
+
+        # Handle the optional q and x sounds (if sound not found).
+        if audio_file is None and letter == 'q' or letter == 'x':
+            k_audio_file = next(voice_path.glob(f"k.*"), None)
+            k_audio = AudioSegment.from_file(k_audio_file)
+            k_audio = strip_silence(k_audio)
+
+            if letter == 'q':
+                w_audio_file = next(voice_path.glob(f"w.*"), None)
+                w_audio = AudioSegment.from_file(w_audio_file)
+                w_audio = strip_silence(w_audio)
+
+                audio = k_audio + w_audio
+                
+            elif letter == 'x':
+                s_audio_file = next(voice_path.glob(f"s.*"), None)
+                s_audio = AudioSegment.from_file(s_audio_file)
+                s_audio = strip_silence(s_audio)
+
+                audio = k_audio + s_audio
+            
+        # Fail to find sound.
+        elif audio_file is None:
+            log.warning(f"Failed to find grapheme's sound file for: '{letter}' ")
+            continue
+
+        # Add sound to dict
+        log.info(f"Added grapheme to dict: '{letter}' ")
+        sound_dict[letter] = audio
+  
     return sound_dict
         
 log.info('Generating sound dictionary.')
-sound_dict = gen_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
+sound_dict = gen_sound_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
     
 
 
 # GENERATE AUDIO FILE
 log.info('Generating audio file.')
 output_audio = AudioSegment.empty()
-input_list = list(INPUT_STRING.upper())
+input_list = list(INPUT_STRING.lower())
 for char in input_list:
     try:
         output_audio += sound_dict[char]
