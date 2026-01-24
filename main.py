@@ -14,18 +14,10 @@ import os
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
-'''
-TO DO
-- generate the silence threshold magic number automatically so its NOT a magic number (and works more consistently)
-- find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
-- make a mode where it can speak each character LIVE so you can run text integration
-'''
-
-
-
 
 VOICE_FOLDER = 'sham'
-INPUT_STRING = 'Hello world.'
+INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.'
+
 
 # TRIM LEADING AND TRAILING SILENCE
 def trim_leading_silence(audio: AudioSegment) -> AudioSegment:
