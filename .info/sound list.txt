@@ -72,6 +72,7 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
 
 	PURE LOGIC
         ng -> n (FALLBACK for if no ng sound provided)
+
         wh - w
         ck -> k
         kn -> n

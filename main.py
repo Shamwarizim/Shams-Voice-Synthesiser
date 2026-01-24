@@ -19,7 +19,8 @@ VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
 VOICE_FOLDER = 'sham_all'
-INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.'
+INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
+#INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
 
 
 # TRIM LEADING AND TRAILING SILENCE
@@ -44,10 +45,18 @@ def strip_silence(audio: AudioSegment) -> AudioSegment:
 # GENERATE SOUNDS DICTIONARY
 def gen_sound_dict(voices_path, voice_folder):
     sound_dict = {}
-
-    ##voice_path = os.path.join(voices_path, voice_folder)
     voice_path = Path(voices_path) / voice_folder
-    # GRAPHEMES (alphabet)
+
+    # SILENCES
+    # AudioSegment.silent's duration field is in milliseconds (1s = 1000ms)
+    sound_dict[' '] = AudioSegment.silent(duration=100)
+    sound_dict['.'] = AudioSegment.silent(duration=200)
+    sound_dict[','] = AudioSegment.silent(duration=200)
+    sound_dict['!'] = AudioSegment.silent(duration=350)
+
+    log.info("Added silences to dict.")
+    
+    # GRAPHEMES (ALPHABET)
     for letter in string.ascii_lowercase:
         # c uses the k sound.
         if letter == 'c':
@@ -106,15 +115,8 @@ for char in input_list:
     try:
         output_audio += sound_dict[char]
     except KeyError:
-        # AudioSegment.silent's duration field is in milliseconds (1s = 1000ms)
-        if char == ' ':
-            output_audio += AudioSegment.silent(duration=100)
-        if char == '.' or char == ',':
-            output_audio += AudioSegment.silent(duration=200)
-        if char == '!':
-            output_audio += AudioSegment.silent(duration=350)
-        else:
-            continue
+        log.warning(f"Couldn't find sound in dict for: {char}")
+        continue
 
 
 #output_audio = speedup(output_audio, playback_speed=2)  # speedup via pydub is SUPER low quality, too much data loss
