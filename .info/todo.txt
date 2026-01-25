@@ -1,3 +1,5 @@
 TO DO
+- make double letters only make 1 noise (exclu vowels)
+
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
 - make a mode where it can speak each character LIVE so you can run text integration

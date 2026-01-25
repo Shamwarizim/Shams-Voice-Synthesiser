@@ -14,15 +14,14 @@ log.getLogger("pydub").setLevel(log.ERROR)
 #DEBUG > INFO > WARNING > ERROR > CRITICAL
 import os
 from pathlib import Path
-import string
 
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
 VOICE_FOLDER = 'sham_all'
-#INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
-INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
+INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
+#INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
 
 
 # TRIM LEADING AND TRAILING SILENCE
@@ -82,7 +81,7 @@ def gen_sound_dict(voices_path, voice_folder):
                 audio = k_audio + w_audio
                 
             elif letter == 'x':
-                s_audio = sound_dict['w']
+                s_audio = sound_dict['s']
                 audio = k_audio + s_audio
             
         # Fail to find sound.
@@ -166,6 +165,12 @@ for i, char in enumerate(input_chars):
         # this of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
         elif next_2 in sound_dict.keys() and not (next_2 in ('mb', 'bt', 'mn') and not at_end_of_word(chunk_size=2)):
             sound = sound_dict[next_2]
+            output_text += next_2
+            skip = 1
+        
+        # Double letters
+        elif next_2 == f'{char}{char}' and next_2.isalpha() and char not in ('a', 'e', 'i', 'o', 'u'):
+            sound = sound_dict[char]
             output_text += next_2
             skip = 1
 
