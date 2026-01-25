@@ -1,6 +1,3 @@
 TO DO
-- silent letters
-    - only at end logic
-
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
 - make a mode where it can speak each character LIVE so you can run text integration

@@ -128,6 +128,8 @@ input_words = INPUT_STRING.lower().split()
 
 skip = 0
 output_text = ''
+live_playback_text = []
+live_playback_sound = []
 for i, char in enumerate(input_chars):  
     if skip > 0:
         skip -= 1
@@ -174,13 +176,8 @@ for i, char in enumerate(input_chars):
 
         output_audio += sound
 
-        print(output_text)
-
-        # play the sound
-        wav = io.BytesIO()
-        sound.export(wav, format="wav")
-        winsound.PlaySound(wav.getvalue(), winsound.SND_MEMORY)
-        
+        live_playback_sound.append(sound)
+        live_playback_text.append(output_text)
 
 
     # FAIL
@@ -195,3 +192,16 @@ for i, char in enumerate(input_chars):
 log.info('Complete. EXPORTING!')
 path = os.path.join(CURRENT_DIR, f"output.mp3")
 output_audio.export(path, format="mp3")
+
+#########################################################################################
+
+print('COMMENCING LIVE PLAYBACK')
+
+for text, sound in zip(live_playback_text, live_playback_sound):
+    print(text)
+    # Play Sound
+    wav = io.BytesIO()
+    sound.export(wav, format="wav")
+    winsound.PlaySound(wav.getvalue(), winsound.SND_MEMORY)
+
+print('------ All done now :) ------')

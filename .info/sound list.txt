@@ -59,7 +59,7 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
 	
 	PURE LOGIC NEEDED (no extra recordings as these make sounds already in the alphabet)
         ph -> f
-        qu -> q (where q is kw)
+        qu -> q
         ce -> s-e
         ci -> s-i
         cy -> s-ee
@@ -81,7 +81,7 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
         ✅ea -> e (theres like 4 different eas but the one that sounds the 'best' in all situations is e)
 	
      in dict but logic of only at end not coded
-        🟨mb (end) -> m
-        🟨bt (end) -> t
-        🟨dge (end) -> j
-        🟨mn (end) -> n
+        ✅mb (end) -> m
+        ✅bt (end) -> t
+        ✅dge (end) -> j
+        ✅mn (end) -> n
