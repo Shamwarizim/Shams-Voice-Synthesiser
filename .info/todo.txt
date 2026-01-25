@@ -1,5 +1,3 @@
 TO DO
-- make double letters only make 1 noise (exclu vowels)
-
+- if a user adds a~ tilda like so on a vowel it does the long vowel sound
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
-- make a mode where it can speak each character LIVE so you can run text integration

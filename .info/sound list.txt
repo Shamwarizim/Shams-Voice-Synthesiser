@@ -8,7 +8,7 @@ Note: A blend is a sound like the "bl" in blend. Two letters make their own soun
 	Therefore, playing the letter sounds separately works well enough.
 
 ==================================================================================================================
-❌GRAPHEMES (ALPHABET)
+✅GRAPHEMES (ALPHABET)
 Note: It's very easy to add an 'uh' sound to the end of consonants like B becoming buh, or D to duh. So you must ensure you do not add extra sounds to the end or the resulting voice will sound bad. Also, make sure each letter is pronounced quickly. If it's too long, words will sound weird.
 
     ✅a ("ah" not long "ay")
@@ -45,25 +45,27 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
         VOWELS
         ay
         ee
+        I
         oa
+        you
 
         OTHER
         sh
         ch
         th
-        ng
+        ng (yes, this is a different sound to n, think about it)
         oo (as in too not book. as that just sounds better when used in incorrect circumstances rather than vice versa)
         er
         oi
         or / oar
 	
 	PURE LOGIC NEEDED (no extra recordings as these make sounds already in the alphabet)
-        ph -> f
-        qu -> q
-        ce -> s-e
-        ci -> s-i
-        cy -> s-ee
-        any double letter -> pronounce just once (exclu oo and ee)
+        ✅ph -> f
+        ✅qu -> q
+        ✅ce -> s-e
+        ✅ci -> s-i
+        cy (end) -> s-ee
+        ✅any double letter -> pronounce just once (exclu oo and ee)
         ui -> oo
         ue -> oo
 

@@ -20,8 +20,9 @@ VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
 VOICE_FOLDER = 'sham_all'
-INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
+#INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
 #INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
+INPUT_STRING = 'phonics, quilt, cell, cinema' # testing digraphs (that just use alphabet sounds)
 
 
 # TRIM LEADING AND TRAILING SILENCE
@@ -108,6 +109,14 @@ def gen_sound_dict(voices_path, voice_folder):
     sound_dict['dge'] = sound_dict['j']
     sound_dict['mn'] = sound_dict['n']
     log.info(f"Added silent di(/tri)graphs.")
+
+    ## TYPICAL
+    sound_dict['ph'] = sound_dict['f']
+    sound_dict['qu'] = sound_dict['q']
+    sound_dict['ce'] = sound_dict['s'] + sound_dict['e']
+    sound_dict['ci'] = sound_dict['s'] + sound_dict['i']
+
+    
 
 
     return sound_dict
