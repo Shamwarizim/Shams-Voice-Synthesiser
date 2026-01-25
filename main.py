@@ -3,6 +3,7 @@
 # python3 -m pip install pydub
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
+from pydub.playback import play
 from pydub.effects import speedup
 import logging as log
 log.basicConfig(format="[%(asctime)s] [%(filename)s/%(levelname)s]: %(message)s (Line: %(lineno)s)",
@@ -19,8 +20,8 @@ VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
 VOICE_FOLDER = 'sham_all'
-INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
-#INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
+#INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
+INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
 
 
 # TRIM LEADING AND TRAILING SILENCE
@@ -57,7 +58,7 @@ def gen_sound_dict(voices_path, voice_folder):
     log.info("Added silences to dict.")
     
     # GRAPHEMES (ALPHABET)
-    for letter in string.ascii_lowercase:
+    for letter in 'abcdefghijklmnoprstuvwyzqx':
         # c uses the k sound.
         if letter == 'c':
             audio_file = next(voice_path.glob(f"k.*"), None)
@@ -73,22 +74,14 @@ def gen_sound_dict(voices_path, voice_folder):
 
         # Handle the optional q and x sounds (if sound not found).
         if audio_file is None and letter == 'q' or letter == 'x':
-            k_audio_file = next(voice_path.glob(f"k.*"), None)
-            k_audio = AudioSegment.from_file(k_audio_file)
-            k_audio = strip_silence(k_audio)
+            k_audio = sound_dict['k'] # q and x are last in the loop, so we already have the sounds we need in the dict
 
             if letter == 'q':
-                w_audio_file = next(voice_path.glob(f"w.*"), None)
-                w_audio = AudioSegment.from_file(w_audio_file)
-                w_audio = strip_silence(w_audio)
-
+                w_audio = sound_dict['w']
                 audio = k_audio + w_audio
                 
             elif letter == 'x':
-                s_audio_file = next(voice_path.glob(f"s.*"), None)
-                s_audio = AudioSegment.from_file(s_audio_file)
-                s_audio = strip_silence(s_audio)
-
+                s_audio = sound_dict['w']
                 audio = k_audio + s_audio
             
         # Fail to find sound.
@@ -100,24 +93,75 @@ def gen_sound_dict(voices_path, voice_folder):
         log.info(f"Added grapheme to dict: '{letter}' ")
         sound_dict[letter] = audio
   
+    # DIGRAPHS
+    ## SILENTS
+    ### Always
+    sound_dict['wh'] = sound_dict['w']
+    sound_dict['ck'] = sound_dict['k']
+    sound_dict['kn'] = sound_dict['n']
+    sound_dict['wr'] = sound_dict['r']
+    sound_dict['gn'] = sound_dict['n']
+    sound_dict['ea'] = sound_dict['e']
+    ### Only at end (logic must be run live ofc)
+    sound_dict['mb'] = sound_dict['m']
+    sound_dict['bt'] = sound_dict['t']
+    sound_dict['dge'] = sound_dict['j']
+    sound_dict['mn'] = sound_dict['n']
+    log.info(f"Added silent di(/tri)graphs: '{letter}' ")
+
+
     return sound_dict
         
 log.info('Generating sound dictionary.')
 sound_dict = gen_sound_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
     
-
+#######################################################################################
 
 # GENERATE AUDIO FILE
 log.info('Generating audio file.')
 output_audio = AudioSegment.empty()
-input_list = list(INPUT_STRING.lower())
-for char in input_list:
+
+input_chars = list(INPUT_STRING.lower())
+input_words = INPUT_STRING.lower().split()
+
+skip = 0
+for i, char in enumerate(input_chars):
+    if skip > 0:
+        log.debug(f'SKIPPED {char}')
+        skip -= 1
+        continue
+
     try:
-        output_audio += sound_dict[char]
+        # where next_ INCLUDES the current character
+        next_3 = input_chars[i : i+3]
+        next_3 = ''.join(next_3)
+        next_2 = input_chars[i : i+2]
+        next_2 = ''.join(next_2)
+
+        # Trigraphs
+        if next_3 in sound_dict.keys():
+            sound = sound_dict[next_3]
+            skip = 2
+
+        # Digraphs
+        elif next_2 in sound_dict.keys():
+            sound = sound_dict[next_2]
+            skip = 1
+
+        # Graphemes (alphabet)
+        else:
+            sound = sound_dict[char]
+
+        output_audio += sound
+        play(sound)
+
+    # FAIL
     except KeyError:
         log.warning(f"Couldn't find sound in dict for: {char}")
         continue
 
+
+#######################################################################################
 
 #output_audio = speedup(output_audio, playback_speed=2)  # speedup via pydub is SUPER low quality, too much data loss
 log.info('Complete. EXPORTING!')

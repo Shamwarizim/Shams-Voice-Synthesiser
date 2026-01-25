@@ -73,15 +73,15 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
 	PURE LOGIC
         ng -> n (FALLBACK for if no ng sound provided)
 
-        wh - w
-        ck -> k
-        kn -> n
-        wr -> r
-        mb (end) -> m
-        bt (end) -> t
-        dge (end) -> j
-        gn -> n
-        mn (end) -> n
-        ea -> e (theres like 4 different eas but the one that sounds the 'best' in all situations is e)
+        ✅wh - w
+        ✅ck -> k
+        ✅kn -> n
+        ✅wr -> r
+        ✅gn -> n
+        ✅ea -> e (theres like 4 different eas but the one that sounds the 'best' in all situations is e)
 	
-	
+     in dict but logic of only at end not coded
+        🟨mb (end) -> m
+        🟨bt (end) -> t
+        🟨dge (end) -> j
+        🟨mn (end) -> n
