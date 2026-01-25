@@ -3,7 +3,6 @@
 # python3 -m pip install pydub
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
-from pydub.playback import play
 from pydub.effects import speedup
 import winsound
 import io
@@ -126,9 +125,10 @@ output_audio = AudioSegment.empty()
 input_chars = list(INPUT_STRING.lower())
 input_words = INPUT_STRING.lower().split()
 
+
 skip = 0
 output_text = ''
-for i, char in enumerate(input_chars):
+for i, char in enumerate(input_chars):  
     if skip > 0:
         skip -= 1
         continue
@@ -140,14 +140,29 @@ for i, char in enumerate(input_chars):
         next_2 = input_chars[i : i+2]
         next_2 = ''.join(next_2)
 
+        # This is required for both trigraphs and digraphs
+        def at_end_of_word(chunk_size: int, input_chars=input_chars, i=i):
+            # Check if at end (for those which require it)
+            try:
+                after_chunk = input_chars[i+chunk_size]
+            except IndexError:
+                after_chunk = ' ' # we can set it to a space cos that signals below that its the end of a word
+        
+            if after_chunk.isalpha():
+                return False
+            else:
+                return True
+
         # Trigraphs
-        if next_3 in sound_dict.keys():
+        # this of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
+        if next_3 in sound_dict.keys() and not (next_3 in ('dge') and not at_end_of_word(chunk_size=3)):
             sound = sound_dict[next_3]
             output_text += next_3
             skip = 2
 
         # Digraphs
-        elif next_2 in sound_dict.keys():
+        # this of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
+        elif next_2 in sound_dict.keys() and not (next_2 in ('mb', 'bt', 'mn') and not at_end_of_word(chunk_size=2)):
             sound = sound_dict[next_2]
             output_text += next_2
             skip = 1
