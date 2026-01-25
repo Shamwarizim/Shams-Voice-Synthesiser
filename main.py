@@ -5,6 +5,8 @@ from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
 from pydub.playback import play
 from pydub.effects import speedup
+import winsound
+import io
 import logging as log
 log.basicConfig(format="[%(asctime)s] [%(filename)s/%(levelname)s]: %(message)s (Line: %(lineno)s)",
                     datefmt="%H:%M:%S",
@@ -107,7 +109,7 @@ def gen_sound_dict(voices_path, voice_folder):
     sound_dict['bt'] = sound_dict['t']
     sound_dict['dge'] = sound_dict['j']
     sound_dict['mn'] = sound_dict['n']
-    log.info(f"Added silent di(/tri)graphs: '{letter}' ")
+    log.info(f"Added silent di(/tri)graphs.")
 
 
     return sound_dict
@@ -117,7 +119,7 @@ sound_dict = gen_sound_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
     
 #######################################################################################
 
-# GENERATE AUDIO FILE
+# GENERATE AUDIO FILE & LIVE PLAYBACK W/ TEXT INTEGRATION
 log.info('Generating audio file.')
 output_audio = AudioSegment.empty()
 
@@ -125,9 +127,9 @@ input_chars = list(INPUT_STRING.lower())
 input_words = INPUT_STRING.lower().split()
 
 skip = 0
+output_text = ''
 for i, char in enumerate(input_chars):
     if skip > 0:
-        log.debug(f'SKIPPED {char}')
         skip -= 1
         continue
 
@@ -141,19 +143,30 @@ for i, char in enumerate(input_chars):
         # Trigraphs
         if next_3 in sound_dict.keys():
             sound = sound_dict[next_3]
+            output_text += next_3
             skip = 2
 
         # Digraphs
         elif next_2 in sound_dict.keys():
             sound = sound_dict[next_2]
+            output_text += next_2
             skip = 1
 
         # Graphemes (alphabet)
         else:
             sound = sound_dict[char]
+            output_text += char
 
         output_audio += sound
-        play(sound)
+
+        print(output_text)
+
+        # play the sound
+        wav = io.BytesIO()
+        sound.export(wav, format="wav")
+        winsound.PlaySound(wav.getvalue(), winsound.SND_MEMORY)
+        
+
 
     # FAIL
     except KeyError:
