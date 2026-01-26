@@ -1,22 +1,4 @@
 TO DO
-- if a user adds a~ tilda like so on a vowel it does the long vowel sound
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
 
 - overhaul live playback to use the exported audio but for text use a list of strings like before but also a list of ints of timings of when to change, theoretically this means there'll be no lag or jitter?
-
-
-
-
-a~ 
-e~
-i~
-o~
-u~ -> y-oo (if no oo, scrap)
-sh
-ch
-th
-ng -> n
-oo -> o
-er
-oi
-or

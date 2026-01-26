@@ -39,7 +39,7 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
     ✅z
 
 ==================================================================================================================
-❌DIGRAPHS
+✅DIGRAPHS
 
 	RECORDINGS NEEDED
         Note: Arrows in the RECORDINGS NEEDED section denote fallbacks if the sound isn't provided. (No arrow no fallback.)
@@ -65,12 +65,13 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
         ✅qu -> q
         ✅ce -> s-e
         ✅ci -> s-i
-        cy (end) -> s-e~
+        ✅cy (end) -> s-e~
+        ✅cy (otherwise) -> s-i~
         ✅any double letter -> pronounce just once (excludes vowels)
-        ui -> oo
-        ue -> oo
-        ee -> e~
-        oar -> or
+        ✅ui -> oo
+        ✅ue -> oo
+        ✅ee -> e~
+        ✅oar -> or
 
 ==================================================================================================================
 ✅SILENT
@@ -82,8 +83,7 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
         ✅wr -> r
         ✅gn -> n
         ✅ea -> e (theres like 4 different eas but the one that sounds the 'best' in all situations is e)
-	
-     in dict but logic of only at end not coded
+        ✅le (end) -> l
         ✅mb (end) -> m
         ✅bt (end) -> t
         ✅dge (end) -> j

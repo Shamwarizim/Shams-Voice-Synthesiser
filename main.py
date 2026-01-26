@@ -20,11 +20,13 @@ CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
-VOICE_FOLDER = 'sham_all'
+VOICE_FOLDER = 'sham_max'
 #INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
 #INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
 #INPUT_STRING = 'phonics, quilt, cell, cinema' # testing digraphs (that just use alphabet sounds)
-INPUT_STRING = 'a~, e~, i~, o~, u~, shoot, chill, the~, wrong, loot, looter, boil, or' # testing the digraph sounds
+#INPUT_STRING = 'a~, e~, i~, o~, u~, shoot, chill, the~, wrong, loot, looter, boil, or' # testing the digraph sounds
+#INPUT_STRING = 'bumble, bouncy, cyan, suit, blue, see, boar' # testing the stuff i just added obviously
+INPUT_STRING = 'a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, a~, e~, i~, o~, u~, sh, ch, th, ng, oo, er, oi, or, ph, qu, ci, cyh, cy, ui, ue, ee, oar, wh, ck, kn, wr, gn, ea, le, mb, bt, dge, mn' # test EVERY sound & digraph and stuff possible.
 
 # TRIM LEADING AND TRAILING SILENCE
 def trim_leading_silence(audio: AudioSegment) -> AudioSegment:
@@ -77,7 +79,7 @@ def gen_sound_dict(voices_path, voice_folder):
             audio = strip_silence(audio)
 
         # Handle the optional q and x sounds (if sound not found).
-        if audio_file is None and letter == 'q' or letter == 'x':
+        if audio_file is None and letter in {'q', 'x'}:
             k_audio = sound_dict['k'] # q and x are last in the loop, so we already have the sounds we need in the dict
 
             if letter == 'q':
@@ -110,14 +112,15 @@ def gen_sound_dict(voices_path, voice_folder):
             audio = strip_silence(audio)
         
         # Add sounds for digraphs with fallback
-        elif digraph in ('u~', 'ng'):
-            # u~
+        elif digraph == 'u~':
             if 'oo' in sound_dict.keys():
                 sound_dict['u~'] = sound_dict['y'] + sound_dict['oo']
+                continue
             else:
                 continue
-            # ng
+        elif digraph == 'ng':
             sound_dict['ng'] = sound_dict['n']
+            continue
         
         # Don't add digraphs without fallback to the dictionary
         else:
@@ -139,26 +142,52 @@ def gen_sound_dict(voices_path, voice_folder):
     sound_dict['gn'] = sound_dict['n']
     sound_dict['ea'] = sound_dict['e']
     ### Only at end (logic must be run live ofc)
+    only_at_end = {'dge',
+                   'mb', 'bt', 'mn', 'le'}
+    sound_dict['dge'] = sound_dict['j']
     sound_dict['mb'] = sound_dict['m']
     sound_dict['bt'] = sound_dict['t']
-    sound_dict['dge'] = sound_dict['j']
     sound_dict['mn'] = sound_dict['n']
+    sound_dict['le'] = sound_dict['l']
+    ### Multiple sound conditions
+    multi_sound_conditions = {'cy'}
+    if 'i~' in sound_dict.keys():
+        sound_dict['cy_typical'] = sound_dict['s'] + sound_dict['i~']
+    else:
+        sound_dict['cy_typical'] = sound_dict['s'] + sound_dict['i']
+    if 'e~' in sound_dict.keys(): 
+        sound_dict['cy_end'] = sound_dict['s'] + sound_dict['e~']
+    else:
+        sound_dict['cy_end'] = sound_dict['s'] + sound_dict['e']
+
 
     ## TYPICAL
     sound_dict['ph'] = sound_dict['f']
     sound_dict['qu'] = sound_dict['q']
     sound_dict['ce'] = sound_dict['s'] + sound_dict['e']
     sound_dict['ci'] = sound_dict['s'] + sound_dict['i']
+    if 'oo' in sound_dict.keys():
+        sound_dict['ui'] = sound_dict['oo']
+        sound_dict['ue'] = sound_dict['oo']
+    else:
+        sound_dict['ui'] = sound_dict['o']
+        sound_dict['ue'] = sound_dict['o']
+    if 'e~' in sound_dict.keys():
+        sound_dict['ee'] = sound_dict['e~']
+    if 'or' in sound_dict.keys():
+        sound_dict['oar'] = sound_dict['or']
+    else:
+        sound_dict['oar'] = sound_dict['o'] + sound_dict['r']
     
     log.info(f"Assigned all di(/tri)graphs to sounds.")
 
     
 
 
-    return sound_dict
+    return sound_dict, only_at_end, multi_sound_conditions
         
 log.info('Generating sound dictionary.')
-sound_dict = gen_sound_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
+sound_dict, only_at_end, multi_sound_conditions = gen_sound_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
     
 #######################################################################################
 
@@ -204,24 +233,41 @@ for i, char in enumerate(input_chars):
                 return True
 
         # Trigraphs
-        # this of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
-        if next_3 in sound_dict.keys() and not (next_3 in ('dge') and not at_end_of_word(chunk_size=3)):
+        # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
+        if next_3 in sound_dict.keys() and not (next_3 in only_at_end and not at_end_of_word(chunk_size=3)):
             sound = sound_dict[next_3]
             output_text += next_3
             skip = 2
 
         # Digraphs
-        # this of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
-        elif next_2 in sound_dict.keys() and not (next_2 in ('mb', 'bt', 'mn') and not at_end_of_word(chunk_size=2)):
+        # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
+        elif next_2 in sound_dict.keys() and not (next_2 in only_at_end and not at_end_of_word(chunk_size=2)):
             sound = sound_dict[next_2]
             output_text += next_2
             skip = 1
         
         # Double letters
-        elif next_2 == f'{char}{char}' and isalpha_ignoring_tilde(next_2) and char not in ('a', 'e', 'i', 'o', 'u'):
+        elif next_2 == f'{char}{char}' and isalpha_ignoring_tilde(next_2) and char not in {'a', 'e', 'i', 'o', 'u'}:
             sound = sound_dict[char]
             output_text += next_2
             skip = 1
+
+        # Multiple sound conditions
+        elif next_2 in multi_sound_conditions:
+            # End of word:
+            if at_end_of_word(chunk_size=2):
+                sound = sound_dict.get(f'{next_2}_end', None)    
+            # Typical:
+            else:
+                sound = sound_dict.get(f'{next_2}_typical', None)
+
+            if sound is not None:
+                output_text += next_2
+                skip = 1
+            else:
+                sound = sound_dict[char]
+                output_text += char
+                skip = 0
 
         # Graphemes (alphabet)
         else:
