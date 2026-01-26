@@ -1,4 +1,6 @@
 TO DO
+- make sure it doesnt error when a special character appears - so like if u cant find it in the dict, play a silence for 0 secs
+
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
 
 - overhaul live playback to use the exported audio but for text use a list of strings like before but also a list of ints of timings of when to change, theoretically this means there'll be no lag or jitter?

@@ -14,19 +14,21 @@ log.getLogger("pydub").setLevel(log.ERROR)
 #DEBUG > INFO > WARNING > ERROR > CRITICAL
 import os
 from pathlib import Path
+import json
 
 
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
 
-VOICE_FOLDER = 'sham_max'
-#INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
-#INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
-#INPUT_STRING = 'phonics, quilt, cell, cinema' # testing digraphs (that just use alphabet sounds)
-#INPUT_STRING = 'a~, e~, i~, o~, u~, shoot, chill, the~, wrong, loot, looter, boil, or' # testing the digraph sounds
-#INPUT_STRING = 'bumble, bouncy, cyan, suit, blue, see, boar' # testing the stuff i just added obviously
-INPUT_STRING = 'a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, a~, e~, i~, o~, u~, sh, ch, th, ng, oo, er, oi, or, ph, qu, ci, cyh, cy, ui, ue, ee, oar, wh, ck, kn, wr, gn, ea, le, mb, bt, dge, mn' # test EVERY sound & digraph and stuff possible.
+# Load settings.
+with open('.INPUT.json', 'r') as f:
+    settings = json.load(f)
+INPUT_STRING = settings['TEXT_TO_SPEAK']
+VOICE_FOLDER = settings['voice_folder_name']
+SFX_ENABLED = settings['sfx_enabled']
+HIDE_TILDE = settings['hide_tildes_in_text_output']
+
 
 # TRIM LEADING AND TRAILING SILENCE
 def trim_leading_silence(audio: AudioSegment) -> AudioSegment:
@@ -277,6 +279,8 @@ for i, char in enumerate(input_chars):
         output_audio += sound
 
         live_playback_sound.append(sound)
+        if HIDE_TILDE:
+            output_text = output_text.replace('~', '')
         live_playback_text.append(output_text)
 
 
