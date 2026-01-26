@@ -15,6 +15,7 @@ log.getLogger("pydub").setLevel(log.ERROR)
 import os
 from pathlib import Path
 
+
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 ####################
@@ -22,8 +23,8 @@ VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 VOICE_FOLDER = 'sham_all'
 #INPUT_STRING = 'Hello world! The quick brown fox jumps over the lazy dog.' # for testing regular letters
 #INPUT_STRING = 'what, flock, knock, wrong, comb, debt, edge, gnaw, column, dead' # for testing silent letters
-INPUT_STRING = 'phonics, quilt, cell, cinema' # testing digraphs (that just use alphabet sounds)
-
+#INPUT_STRING = 'phonics, quilt, cell, cinema' # testing digraphs (that just use alphabet sounds)
+INPUT_STRING = 'a~, e~, i~, o~, u~, shoot, chill, the~, wrong, loot, looter, boil, or' # testing the digraph sounds
 
 # TRIM LEADING AND TRAILING SILENCE
 def trim_leading_silence(audio: AudioSegment) -> AudioSegment:
@@ -51,6 +52,7 @@ def gen_sound_dict(voices_path, voice_folder):
 
     # SILENCES
     # AudioSegment.silent's duration field is in milliseconds (1s = 1000ms)
+    sound_dict['~'] = AudioSegment.silent(duration=0)
     sound_dict[' '] = AudioSegment.silent(duration=100)
     sound_dict['.'] = AudioSegment.silent(duration=200)
     sound_dict[','] = AudioSegment.silent(duration=200)
@@ -58,7 +60,8 @@ def gen_sound_dict(voices_path, voice_folder):
 
     log.info("Added silences to dict.")
     
-    # GRAPHEMES (ALPHABET)
+    # LOAD SOUNDS FROM FILE
+    ## GRAPHEMES (ALPHABET)
     for letter in 'abcdefghijklmnoprstuvwyzqx':
         # c uses the k sound.
         if letter == 'c':
@@ -91,10 +94,42 @@ def gen_sound_dict(voices_path, voice_folder):
             continue
 
         # Add sound to dict
-        log.info(f"Added grapheme to dict: '{letter}' ")
         sound_dict[letter] = audio
-  
-    # DIGRAPHS
+        log.info(f"Added grapheme from file to dict: '{letter}' ")
+
+    
+    ## DIGRAPH SOUNDS
+    digraph_list = ['sh', 'ch', 'th', 'ng', 'oo', 'er', 'oi', 'or',
+               'a~', 'e~', 'i~', 'o~', 'u~']
+    for digraph in digraph_list:
+        audio_file = next(voice_path.glob(f"{digraph}.*"), None) # grabs first item from glob search
+
+        # Grab and clean audio if found.
+        if audio_file:
+            audio = AudioSegment.from_file(audio_file)
+            audio = strip_silence(audio)
+        
+        # Add sounds for digraphs with fallback
+        elif digraph in ('u~', 'ng'):
+            # u~
+            if 'oo' in sound_dict.keys():
+                sound_dict['u~'] = sound_dict['y'] + sound_dict['oo']
+            else:
+                continue
+            # ng
+            sound_dict['ng'] = sound_dict['n']
+        
+        # Don't add digraphs without fallback to the dictionary
+        else:
+            log.info(f"Couldn't find sound file for: '{digraph}' ")
+            continue
+        
+        # Add sound to dict
+        sound_dict[digraph] = audio
+        log.info(f"Added digraph from file to dict: '{digraph}' ")
+    
+
+    # ASSIGN DI(/TRI)GRAPHS TO PRE-LOADED SOUNDS
     ## SILENTS
     ### Always
     sound_dict['wh'] = sound_dict['w']
@@ -108,13 +143,14 @@ def gen_sound_dict(voices_path, voice_folder):
     sound_dict['bt'] = sound_dict['t']
     sound_dict['dge'] = sound_dict['j']
     sound_dict['mn'] = sound_dict['n']
-    log.info(f"Added silent di(/tri)graphs.")
 
     ## TYPICAL
     sound_dict['ph'] = sound_dict['f']
     sound_dict['qu'] = sound_dict['q']
     sound_dict['ce'] = sound_dict['s'] + sound_dict['e']
     sound_dict['ci'] = sound_dict['s'] + sound_dict['i']
+    
+    log.info(f"Assigned all di(/tri)graphs to sounds.")
 
     
 
@@ -151,6 +187,10 @@ for i, char in enumerate(input_chars):
         next_2 = ''.join(next_2)
 
         # This is required for both trigraphs and digraphs
+        def isalpha_ignoring_tilde(string):
+            return string.replace('~', '').isalpha()
+
+
         def at_end_of_word(chunk_size: int, input_chars=input_chars, i=i):
             # Check if at end (for those which require it)
             try:
@@ -158,7 +198,7 @@ for i, char in enumerate(input_chars):
             except IndexError:
                 after_chunk = ' ' # we can set it to a space cos that signals below that its the end of a word
         
-            if after_chunk.isalpha():
+            if isalpha_ignoring_tilde(after_chunk):
                 return False
             else:
                 return True
@@ -178,7 +218,7 @@ for i, char in enumerate(input_chars):
             skip = 1
         
         # Double letters
-        elif next_2 == f'{char}{char}' and next_2.isalpha() and char not in ('a', 'e', 'i', 'o', 'u'):
+        elif next_2 == f'{char}{char}' and isalpha_ignoring_tilde(next_2) and char not in ('a', 'e', 'i', 'o', 'u'):
             sound = sound_dict[char]
             output_text += next_2
             skip = 1

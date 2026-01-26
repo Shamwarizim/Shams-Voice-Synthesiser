@@ -41,40 +41,41 @@ Note: It's very easy to add an 'uh' sound to the end of consonants like B becomi
 ==================================================================================================================
 ❌DIGRAPHS
 
-	RECORDINGS NEEDED (but have fallback logic to sound each letter if digraph sound not provided)
+	RECORDINGS NEEDED
+        Note: Arrows in the RECORDINGS NEEDED section denote fallbacks if the sound isn't provided. (No arrow no fallback.)
         VOWELS
-        ay
-        ee
-        I
-        oa
-        you
+        ✅a~
+        ✅e~
+        ✅i~
+        ✅o~
+        ✅u~ -> y-oo (if no oo, scrap)
 
         OTHER
-        sh
-        ch
-        th
-        ng (yes, this is a different sound to n, think about it)
-        oo (as in too not book. as that just sounds better when used in incorrect circumstances rather than vice versa)
-        er
-        oi
-        or / oar
+        ✅sh
+        ✅ch
+        ✅th
+        ✅ng (yes, this is a different sound to n, think about it) -> n
+        ✅oo (as in too not book. as that just sounds better when used in incorrect circumstances rather than vice versa)
+        ✅er
+        ✅oi
+        ✅or
 	
 	PURE LOGIC NEEDED (no extra recordings as these make sounds already in the alphabet)
         ✅ph -> f
         ✅qu -> q
         ✅ce -> s-e
         ✅ci -> s-i
-        cy (end) -> s-ee
-        ✅any double letter -> pronounce just once (exclu oo and ee)
+        cy (end) -> s-e~
+        ✅any double letter -> pronounce just once (excludes vowels)
         ui -> oo
         ue -> oo
+        ee -> e~
+        oar -> or
 
 ==================================================================================================================
-❌SILENT
+✅SILENT
 
 	PURE LOGIC
-        ng -> n (FALLBACK for if no ng sound provided)
-
         ✅wh - w
         ✅ck -> k
         ✅kn -> n
