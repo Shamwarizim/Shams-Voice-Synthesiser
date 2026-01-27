@@ -1,5 +1,7 @@
 {
-    "TEXT_TO_SPEAK": "Hello~ world! The~ quick brown fox jumps o~ver the~ la~zy dog.",
+    "TEXT_TO_SPEAK": "#shamwarizim_",
+
+    
     "voice_folder_name": "sham_max",
     "sfx_enabled": true,
     "hide_tildes_in_text_output": false

@@ -58,8 +58,7 @@ def gen_sound_dict(voices_path, voice_folder):
     # AudioSegment.silent's duration field is in milliseconds (1s = 1000ms)
     sound_dict['~'] = AudioSegment.silent(duration=0)
     sound_dict[' '] = AudioSegment.silent(duration=100)
-    sound_dict['.'] = AudioSegment.silent(duration=200)
-    sound_dict[','] = AudioSegment.silent(duration=200)
+    sound_dict['\\'] = sound_dict['/'] = sound_dict[','] = sound_dict['.'] = AudioSegment.silent(duration=200)
     sound_dict['!'] = AudioSegment.silent(duration=350)
 
     log.info("Added silences to dict.")
@@ -237,21 +236,21 @@ for i, char in enumerate(input_chars):
         # Trigraphs
         # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
         if next_3 in sound_dict.keys() and not (next_3 in only_at_end and not at_end_of_word(chunk_size=3)):
-            sound = sound_dict[next_3]
             output_text += next_3
+            sound = sound_dict[next_3]
             skip = 2
 
         # Digraphs
         # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
         elif next_2 in sound_dict.keys() and not (next_2 in only_at_end and not at_end_of_word(chunk_size=2)):
-            sound = sound_dict[next_2]
             output_text += next_2
+            sound = sound_dict[next_2]
             skip = 1
         
         # Double letters
         elif next_2 == f'{char}{char}' and isalpha_ignoring_tilde(next_2) and char not in {'a', 'e', 'i', 'o', 'u'}:
-            sound = sound_dict[char]
             output_text += next_2
+            sound = sound_dict[char]
             skip = 1
 
         # Multiple sound conditions
@@ -267,27 +266,29 @@ for i, char in enumerate(input_chars):
                 output_text += next_2
                 skip = 1
             else:
-                sound = sound_dict[char]
                 output_text += char
+                sound = sound_dict[char]
                 skip = 0
 
         # Graphemes (alphabet)
         else:
-            sound = sound_dict[char]
             output_text += char
+            sound = sound_dict[char]
 
-        output_audio += sound
-
-        live_playback_sound.append(sound)
-        if HIDE_TILDE:
-            output_text = output_text.replace('~', '')
-        live_playback_text.append(output_text)
-
-
-    # FAIL
+    # FAILED TO FIND SOUND
     except KeyError:
         log.warning(f"Couldn't find sound in dict for: {char}")
-        continue
+        sound = AudioSegment.silent(duration=0)
+    
+    # OUTPUT
+    output_audio += sound
+    live_playback_sound.append(sound)
+
+    if HIDE_TILDE:
+        output_text = output_text.replace('~', '')
+    live_playback_text.append(output_text)
+
+    
 
 
 #######################################################################################
