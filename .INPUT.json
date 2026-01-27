@@ -1,8 +1,12 @@
 {
-    "TEXT_TO_SPEAK": "#shamwarizim_",
+    "TEXT_TO_SPEAK": "Hi~ ~",
 
     
-    "voice_folder_name": "sham_max",
-    "sfx_enabled": true,
+    "voice_folder_name": "sham_min",
+    
+    "sfx_enabled": false,
+    "characters_that_play_sfx": ["*", "$"],
+    "sfx_file_for_characters_to_use": ["bleep", "cash_register"],
+
     "hide_tildes_in_text_output": false
 }

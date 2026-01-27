@@ -19,6 +19,8 @@ import json
 
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
+SFX_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "sfx"))
+
 ####################
 
 # Load settings.
@@ -26,8 +28,12 @@ with open('.INPUT.json', 'r') as f:
     settings = json.load(f)
 INPUT_STRING = settings['TEXT_TO_SPEAK']
 VOICE_FOLDER = settings['voice_folder_name']
+
 SFX_ENABLED = settings['sfx_enabled']
+SFX_DICT = dict(zip(settings['characters_that_play_sfx'], settings['sfx_file_for_characters_to_use']))
+
 HIDE_TILDE = settings['hide_tildes_in_text_output']
+
 
 
 # TRIM LEADING AND TRAILING SILENCE
@@ -53,13 +59,26 @@ def strip_silence(audio: AudioSegment) -> AudioSegment:
 def gen_sound_dict(voices_path, voice_folder):
     sound_dict = {}
     voice_path = Path(voices_path) / voice_folder
+    sfx_path = Path(SFX_PATH)
+
+    def assign_existing_sounds(sound_names: list):
+        new_sound = AudioSegment.empty()
+        for sound_name in sound_names:
+            new_sound += sound_dict[sound_name]
+        return new_sound
 
     # SILENCES
     # AudioSegment.silent's duration field is in milliseconds (1s = 1000ms)
+    #0
     sound_dict['~'] = AudioSegment.silent(duration=0)
-    sound_dict[' '] = AudioSegment.silent(duration=100)
-    sound_dict['\\'] = sound_dict['/'] = sound_dict[','] = sound_dict['.'] = AudioSegment.silent(duration=200)
-    sound_dict['!'] = AudioSegment.silent(duration=350)
+    #50
+    for char in ['(', ')', '[', ']', '{', '}', ':', ';', '"', "'"]: sound_dict[char] = AudioSegment.silent(duration=50)
+    #100
+    for char in [' ', '-']: sound_dict[char] = AudioSegment.silent(duration=100)
+    #200
+    for char in ['.', ',', '/', '\\']: sound_dict[char] = AudioSegment.silent(duration=200)
+    #350
+    for char in ['!', '?', '...', '…']: sound_dict[char] = AudioSegment.silent(duration=350)
 
     log.info("Added silences to dict.")
     
@@ -115,7 +134,7 @@ def gen_sound_dict(voices_path, voice_folder):
         # Add sounds for digraphs with fallback
         elif digraph == 'u~':
             if 'oo' in sound_dict.keys():
-                sound_dict['u~'] = sound_dict['y'] + sound_dict['oo']
+                sound_dict['u~'] = assign_existing_sounds(['y', 'oo'])
                 continue
             else:
                 continue
@@ -153,20 +172,20 @@ def gen_sound_dict(voices_path, voice_folder):
     ### Multiple sound conditions
     multi_sound_conditions = {'cy'}
     if 'i~' in sound_dict.keys():
-        sound_dict['cy_typical'] = sound_dict['s'] + sound_dict['i~']
+        sound_dict['cy_typical'] = assign_existing_sounds(['s', 'i~'])
     else:
-        sound_dict['cy_typical'] = sound_dict['s'] + sound_dict['i']
+        sound_dict['cy_typical'] = assign_existing_sounds(['s', 'i'])
     if 'e~' in sound_dict.keys(): 
-        sound_dict['cy_end'] = sound_dict['s'] + sound_dict['e~']
+        sound_dict['cy_end'] = assign_existing_sounds(['s', 'e~'])
     else:
-        sound_dict['cy_end'] = sound_dict['s'] + sound_dict['e']
+        sound_dict['cy_end'] = assign_existing_sounds(['s', 'e'])
 
 
     ## TYPICAL
     sound_dict['ph'] = sound_dict['f']
     sound_dict['qu'] = sound_dict['q']
-    sound_dict['ce'] = sound_dict['s'] + sound_dict['e']
-    sound_dict['ci'] = sound_dict['s'] + sound_dict['i']
+    sound_dict['ce'] = assign_existing_sounds(['s', 'e'])
+    sound_dict['ci'] = assign_existing_sounds(['s', 'i'])
     if 'oo' in sound_dict.keys():
         sound_dict['ui'] = sound_dict['oo']
         sound_dict['ue'] = sound_dict['oo']
@@ -178,9 +197,147 @@ def gen_sound_dict(voices_path, voice_folder):
     if 'or' in sound_dict.keys():
         sound_dict['oar'] = sound_dict['or']
     else:
-        sound_dict['oar'] = sound_dict['o'] + sound_dict['r']
+        sound_dict['oar'] = assign_existing_sounds(['o', 'r'])
     
     log.info(f"Assigned all di(/tri)graphs to sounds.")
+
+
+    # SPECIAL CHARACTERS TO READ OUT
+    ## Numbers
+    sound_dict['1'] = assign_existing_sounds(['w', 'u', 'n'])
+
+    if 'oo' in sound_dict.keys():
+        sound_dict['2'] = assign_existing_sounds(['t', 'oo'])
+    else:
+        sound_dict['2'] = assign_existing_sounds(['t', 'w', 'o'])
+
+    if 'th' in sound_dict.keys() and 'ee' in sound_dict.keys():
+        sound_dict['3'] = assign_existing_sounds(['th', 'r', 'ee'])
+    else:
+        sound_dict['3'] = assign_existing_sounds(['t', 'h', 'r', 'e', 'e'])
+    
+    if 'or' in sound_dict.keys():
+        sound_dict['4'] = assign_existing_sounds(['f', 'or'])
+    else:
+        sound_dict['4'] = assign_existing_sounds(['f', 'o', 'r'])
+    
+    if 'i~' in sound_dict.keys():
+        sound_dict['5'] = assign_existing_sounds(['f', 'i~', 'v'])
+    else:
+        sound_dict['5'] = assign_existing_sounds(['f', 'i', 'v'])
+    
+    sound_dict['6'] = assign_existing_sounds(['s', 'i', 'x'])
+
+    sound_dict['7'] = assign_existing_sounds(['s', 'e', 'v', 'i', 'n'])
+
+    if 'a~' in sound_dict.keys():
+        sound_dict['8'] = assign_existing_sounds(['a~', 't'])
+    else:
+        sound_dict['8'] = assign_existing_sounds(['e', 't'])
+    
+    if 'i~' in sound_dict.keys():
+        sound_dict['9'] = assign_existing_sounds(['n', 'i~', 'n'])
+    else:
+        sound_dict['9'] = assign_existing_sounds(['n', 'i', 'n'])
+    
+    if 'e~' in sound_dict.keys() and 'o~' in sound_dict.keys():
+        sound_dict['0'] = assign_existing_sounds(['z', 'e~', 'r', 'o~'])
+    elif 'e~' in sound_dict.keys():
+        sound_dict['0'] = assign_existing_sounds(['z', 'e~', 'r', 'o'])
+    elif 'o~' in sound_dict.keys():
+        sound_dict['0'] = assign_existing_sounds(['z', 'e', 'r', 'o~'])
+    else:
+        sound_dict['0'] = assign_existing_sounds(['z', 'e', 'r', 'o'])
+
+    ## NOT NUMBERS
+    sound_dict['@'] = assign_existing_sounds(['a', 't'])
+
+    if 'sh' in sound_dict.keys():
+        sound_dict['#'] = assign_existing_sounds(['h', 'a', 'sh', 't', 'a', 'g'])
+    else:
+        sound_dict['#'] = assign_existing_sounds(['h', 'a', 's', 'h', 't', 'a', 'g'])
+    
+    if 'er' in sound_dict.keys():
+        sound_dict['$'] = assign_existing_sounds(['d', 'o', 'l', 'er'])
+    else:
+        sound_dict['$'] = assign_existing_sounds(['d', 'o', 'l', 'u'])
+    
+    if 'er' in sound_dict.keys():
+        sound_dict['%'] = assign_existing_sounds(['p', 'er', 's', 'e', 'n', 't'])
+    else:
+        sound_dict['%'] = assign_existing_sounds(['p', 'e', 'r', 's', 'e', 'n', 't'])
+    
+    sound_dict['^'] = assign_existing_sounds(['c', 'a', 'r', 'i', 't'])
+
+    sound_dict['&'] = assign_existing_sounds(['a', 'n', 'd'])
+
+    if 'er' in sound_dict.keys():
+        sound_dict['*'] = assign_existing_sounds(['a', 's', 't', 'er', 'i', 's', 'k'])
+    else:
+        sound_dict['*'] = assign_existing_sounds(['a', 's', 't', 'e', 'r', 'i', 's', 'k'])
+    
+    if 'er' in sound_dict.keys() and 'or' in sound_dict.keys():
+        sound_dict['_'] = assign_existing_sounds(['u', 'n', 'd', 'er', 's', 'k', 'or'])
+    elif 'er' in sound_dict.keys():
+        sound_dict['_'] = assign_existing_sounds(['u', 'n', 'd', 'er', 's', 'k', 'o'])
+    elif 'or' in sound_dict.keys():
+        sound_dict['_'] = assign_existing_sounds(['u', 'n', 'd', 'or', 's', 'k', 'or'])
+    else:
+        sound_dict['_'] = assign_existing_sounds(['u', 'n', 'd', 'o', 's', 'k', 'o'])
+    
+    sound_dict['+'] = assign_existing_sounds(['p', 'l', 'u', 's'])
+
+    if 'e~' in sound_dict.keys():
+        sound_dict['='] = assign_existing_sounds(['e~', 'q', 'l', 's'])
+    else:
+        sound_dict['='] = assign_existing_sounds(['e', 'q', 'l', 's'])
+    
+    if 'i~' in sound_dict.keys():
+        sound_dict['|'] = assign_existing_sounds(['p', 'i~', 'p'])
+    else:
+        sound_dict['|'] = assign_existing_sounds(['p', 'i', 'p'])
+    
+    if 'th' in sound_dict.keys():
+        sound_dict['<'] = assign_existing_sounds(['l', 'e', 's', ' ', 'th', 'a', 'n'])
+    else:
+        sound_dict['<'] = assign_existing_sounds(['l', 'e', 's', ' ', 't', 'h', 'a', 'n'])
+    
+    # >
+    if 'a~' in sound_dict.keys():
+        a = 'a~'
+    else:
+        a = 'e'
+    if 'er' in sound_dict.keys():
+        er = 'er'
+    else:
+        er = 'u'
+    if 'th' in sound_dict.keys():
+        th = 'th'
+    else:
+        th = 't'
+    sound_dict['>'] = assign_existing_sounds(['g', 'r', a, 't', er, th, 'a', 'n'])
+
+    sound_dict['~'] = assign_existing_sounds(['t', 'i', 'l', 'd', 'u'])
+    
+    log.info(f"Assigned read out special characters to sounds.")
+
+    
+    # SFX
+    if SFX_ENABLED:
+        for char, file_name in SFX_DICT.items():
+            audio_file = next(sfx_path.glob(f"{file_name}.*"), None) # grabs first item from glob search
+
+            # Grab and clean audio if found.
+            if audio_file:
+                audio = AudioSegment.from_file(audio_file)
+            
+            # Fail
+            else:
+                log.warning(f'Failed to find SFX file "{file_name}" for {char}')
+                continue
+
+            sound_dict[char] = audio
+            log.info(f"Added SFX '{file_name}' from file to dict for: {char}")
 
     
 
