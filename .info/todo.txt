@@ -1,11 +1,12 @@
 TO DO
-- ‼️ text output has capitals and lowercase ugh
-- rewrite the hide_tilda setting so that it only gets rid of tildes right after vowels
+- ‼️ text output has capitals as lowercase ugh
 
 - make gen_sound_dict() not a function. it does not need to be a func
 
-- find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
-
 - overhaul live playback to use the exported audio but for text use a list of strings like before but also a list of ints of timings of when to change, theoretically this means there'll be no lag or jitter?
 
+- find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
+
+
+SO LOW PRIORITY THAT I'LL PROBABLY NOT DO IT
 - bug: when you dont have long vowel sounds, the tilde li~ke so~ is read out

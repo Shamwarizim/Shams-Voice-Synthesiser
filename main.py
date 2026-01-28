@@ -32,7 +32,7 @@ VOICE_FOLDER = settings['voice_folder_name']
 SFX_ENABLED = settings['sfx_enabled']
 SFX_DICT = dict(zip(settings['characters_that_play_sfx'], settings['sfx_file_for_characters_to_use']))
 
-HIDE_TILDE = settings['hide_tildes_in_text_output']
+HIDE_VOWEL_TILDES = settings['hide_tildes_denoting_long_vowels_in_text_output']
 
 
 
@@ -318,7 +318,7 @@ def gen_sound_dict(voices_path, voice_folder):
     sound_dict['>'] = assign_existing_sounds(['g', 'r', a, 't', er, th, 'a', 'n'])
 
     sound_dict['~'] = assign_existing_sounds(['t', 'i', 'l', 'd', 'u'])
-    
+
     log.info(f"Assigned read out special characters to sounds.")
 
     
@@ -441,8 +441,8 @@ for i, char in enumerate(input_chars):
     output_audio += sound
     live_playback_sound.append(sound)
 
-    if HIDE_TILDE:
-        output_text = output_text.replace('~', '')
+    if HIDE_VOWEL_TILDES:
+        output_text = output_text.replace('a~', 'a').replace('e~', 'e').replace('i~', 'i').replace('o~', 'o').replace('u~', 'u')
     live_playback_text.append(output_text)
 
     
