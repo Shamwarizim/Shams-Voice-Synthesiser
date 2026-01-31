@@ -1,8 +1,9 @@
 {
     "TEXT_TO_SPEAK": "Hello world. Programmed to work and not to feel.",
 
-    
     "voice_folder_name": "sham_max",
+
+    
     "regenerate_sound_dictionary": false,
 
     "sfx_enabled": false,
