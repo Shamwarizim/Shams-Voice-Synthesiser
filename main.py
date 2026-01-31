@@ -367,35 +367,38 @@ if (not USE_PKL) or (failed_to_find_pkl is True):
 log.info('Generating audio file.')
 output_audio = AudioSegment.empty()
 
-input_chars = list(INPUT_STRING.lower())
-input_words = INPUT_STRING.lower().split()
+input_chars = list(INPUT_STRING)
+input_chars_lowercase = list(INPUT_STRING.lower())
 
 
 skip = 0
 output_text = ''
 live_playback_text = []
 live_playback_sound = []
-for i, char in enumerate(input_chars):  
+for i, char_lowercase in enumerate(input_chars_lowercase):  
     if skip > 0:
         skip -= 1
         continue
 
     try:
         # where next_ INCLUDES the current character
-        next_3 = input_chars[i : i+3]
-        next_3 = ''.join(next_3)
-        next_2 = input_chars[i : i+2]
-        next_2 = ''.join(next_2)
+        next_3_lowercase = ''.join( input_chars_lowercase[i : i+3] )
+        next_3_output = ''.join( input_chars[i : i+3] )
+
+        next_2_lowercase = ''.join( input_chars_lowercase[i : i+2] )
+        next_2_output = ''.join( input_chars[i : i+2] )
+
+        char_output = input_chars[i]
 
         # This is required for both trigraphs and digraphs
         def isalpha_ignoring_tilde(string):
             return string.replace('~', '').isalpha()
 
 
-        def at_end_of_word(chunk_size: int, input_chars=input_chars, i=i):
+        def at_end_of_word(chunk_size: int, input_chars_lowercase=input_chars_lowercase, i=i):
             # Check if at end (for those which require it)
             try:
-                after_chunk = input_chars[i+chunk_size]
+                after_chunk = input_chars_lowercase[i+chunk_size]
             except IndexError:
                 after_chunk = ' ' # we can set it to a space cos that signals below that its the end of a word
         
@@ -406,49 +409,49 @@ for i, char in enumerate(input_chars):
 
         # Trigraphs
         # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
-        if next_3 in sound_dict.keys() and not (next_3 in ONLY_AT_END and not at_end_of_word(chunk_size=3)):
-            output_text += next_3
-            sound = sound_dict[next_3]
+        if next_3_lowercase in sound_dict.keys() and not (next_3_lowercase in ONLY_AT_END and not at_end_of_word(chunk_size=3)):
+            output_text += next_3_output
+            sound = sound_dict[next_3_lowercase]
             skip = 2
 
         # Digraphs
         # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
-        elif next_2 in sound_dict.keys() and not (next_2 in ONLY_AT_END and not at_end_of_word(chunk_size=2)):
-            output_text += next_2
-            sound = sound_dict[next_2]
+        elif next_2_lowercase in sound_dict.keys() and not (next_2_lowercase in ONLY_AT_END and not at_end_of_word(chunk_size=2)):
+            output_text += next_2_output
+            sound = sound_dict[next_2_lowercase]
             skip = 1
         
         # Double letters
-        elif next_2 == f'{char}{char}' and isalpha_ignoring_tilde(next_2) and char not in {'a', 'e', 'i', 'o', 'u'}:
-            output_text += next_2
-            sound = sound_dict[char]
+        elif next_2_lowercase == f'{char_lowercase}{char_lowercase}' and isalpha_ignoring_tilde(next_2_lowercase) and char_lowercase not in {'a', 'e', 'i', 'o', 'u'}:
+            output_text += next_2_output
+            sound = sound_dict[char_lowercase]
             skip = 1
 
         # Multiple sound conditions
-        elif next_2 in MULTI_SOUND_CONDITIONS:
+        elif next_2_lowercase in MULTI_SOUND_CONDITIONS:
             # End of word:
             if at_end_of_word(chunk_size=2):
-                sound = sound_dict.get(f'{next_2}_end', None)    
+                sound = sound_dict.get(f'{next_2_lowercase}_end', None)    
             # Typical:
             else:
-                sound = sound_dict.get(f'{next_2}_typical', None)
+                sound = sound_dict.get(f'{next_2_lowercase}_typical', None)
 
             if sound is not None:
-                output_text += next_2
+                output_text += next_2_output
                 skip = 1
             else:
-                output_text += char
-                sound = sound_dict[char]
+                output_text += char_output
+                sound = sound_dict[char_lowercase]
                 skip = 0
 
         # Graphemes (alphabet)
         else:
-            output_text += char
-            sound = sound_dict[char]
+            output_text += char_output
+            sound = sound_dict[char_lowercase]
 
     # FAILED TO FIND SOUND
     except KeyError:
-        log.warning(f"Couldn't find sound in dict for: {char}")
+        log.warning(f"Couldn't find sound in dict for: {char_lowercase}")
         sound = AudioSegment.silent(duration=0)
     
     # OUTPUT
