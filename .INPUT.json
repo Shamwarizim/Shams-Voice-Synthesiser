@@ -1,9 +1,10 @@
 {
-    "TEXT_TO_SPEAK": "Hi~ ~",
+    "TEXT_TO_SPEAK": "Hello world. Programmed to work and not to feel.",
 
     
     "voice_folder_name": "sham_max",
-    
+    "regenerate_sound_dictionary": false,
+
     "sfx_enabled": false,
     "characters_that_play_sfx": ["*", "$"],
     "sfx_file_for_characters_to_use": ["bleep", "cash_register"],

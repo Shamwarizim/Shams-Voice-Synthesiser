@@ -15,11 +15,18 @@ log.getLogger("pydub").setLevel(log.ERROR)
 import os
 from pathlib import Path
 import json
+import pickle
 
 
 CURRENT_DIR = os.path.dirname(__file__)
 VOICES_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "voices"))
 SFX_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "sfx"))
+PKL_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "pickles"))
+SOUND_DICT_PKL_PATH = os.path.abspath(os.path.join(PKL_PATH, 'sound_dict'))
+
+ONLY_AT_END = {'dge',
+            'mb', 'bt', 'mn', 'le'}
+MULTI_SOUND_CONDITIONS = {'cy'}
 
 ####################
 
@@ -27,7 +34,9 @@ SFX_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "sfx"))
 with open('.INPUT.json', 'r') as f:
     settings = json.load(f)
 INPUT_STRING = settings['TEXT_TO_SPEAK']
-VOICE_FOLDER = settings['voice_folder_name']
+
+VOICE_NAME = settings['voice_folder_name']
+USE_PKL = not settings['regenerate_sound_dictionary']
 
 SFX_ENABLED = settings['sfx_enabled']
 SFX_DICT = dict(zip(settings['characters_that_play_sfx'], settings['sfx_file_for_characters_to_use']))
@@ -56,9 +65,22 @@ def strip_silence(audio: AudioSegment) -> AudioSegment:
 
 
 # GENERATE SOUNDS DICTIONARY
-def gen_sound_dict(voices_path, voice_folder):
+# Load From PKL
+if USE_PKL:
+    log.info(f'Loading sound dictionary from: {VOICE_NAME}.pkl')
+    try:
+        path = os.path.join(SOUND_DICT_PKL_PATH, f'{VOICE_NAME}.pkl')
+        with open(path, 'rb') as f:
+            sound_dict = pickle.load(f)
+        failed_to_find_pkl = False
+    except FileNotFoundError:
+        failed_to_find_pkl = True
+
+# Generate From Scratch
+if (not USE_PKL) or (failed_to_find_pkl is True):
+    log.info('Generating sound dictionary.')
     sound_dict = {}
-    voice_path = Path(voices_path) / voice_folder
+    voice_path = Path(VOICES_PATH) / VOICE_NAME
     sfx_path = Path(SFX_PATH)
 
     def assign_existing_sounds(sound_names: list):
@@ -162,15 +184,12 @@ def gen_sound_dict(voices_path, voice_folder):
     sound_dict['gn'] = sound_dict['n']
     sound_dict['ea'] = sound_dict['e']
     ### Only at end (logic must be run live ofc)
-    only_at_end = {'dge',
-                   'mb', 'bt', 'mn', 'le'}
     sound_dict['dge'] = sound_dict['j']
     sound_dict['mb'] = sound_dict['m']
     sound_dict['bt'] = sound_dict['t']
     sound_dict['mn'] = sound_dict['n']
     sound_dict['le'] = sound_dict['l']
     ### Multiple sound conditions
-    multi_sound_conditions = {'cy'}
     if 'i~' in sound_dict.keys():
         sound_dict['cy_typical'] = assign_existing_sounds(['s', 'i~'])
     else:
@@ -200,7 +219,6 @@ def gen_sound_dict(voices_path, voice_folder):
         sound_dict['oar'] = assign_existing_sounds(['o', 'r'])
     
     log.info(f"Assigned all di(/tri)graphs to sounds.")
-
 
     # SPECIAL CHARACTERS TO READ OUT
     ## Numbers
@@ -321,7 +339,6 @@ def gen_sound_dict(voices_path, voice_folder):
 
     log.info(f"Assigned read out special characters to sounds.")
 
-    
     # SFX
     if SFX_ENABLED:
         for char, file_name in SFX_DICT.items():
@@ -338,14 +355,11 @@ def gen_sound_dict(voices_path, voice_folder):
 
             sound_dict[char] = audio
             log.info(f"Added SFX '{file_name}' from file to dict for: {char}")
-
     
-
-
-    return sound_dict, only_at_end, multi_sound_conditions
-        
-log.info('Generating sound dictionary.')
-sound_dict, only_at_end, multi_sound_conditions = gen_sound_dict(voices_path=VOICES_PATH, voice_folder=VOICE_FOLDER)
+    # Save to PKL
+    path = os.path.join(SOUND_DICT_PKL_PATH, f'{VOICE_NAME}.pkl')
+    with open(path, 'wb') as f:
+        pickle.dump(sound_dict, f)
     
 #######################################################################################
 
@@ -392,14 +406,14 @@ for i, char in enumerate(input_chars):
 
         # Trigraphs
         # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
-        if next_3 in sound_dict.keys() and not (next_3 in only_at_end and not at_end_of_word(chunk_size=3)):
+        if next_3 in sound_dict.keys() and not (next_3 in ONLY_AT_END and not at_end_of_word(chunk_size=3)):
             output_text += next_3
             sound = sound_dict[next_3]
             skip = 2
 
         # Digraphs
         # think of the conditional as two separate conditionals, the second one is an if which is passing essentially (except it needs to be on this line so the code below runs)
-        elif next_2 in sound_dict.keys() and not (next_2 in only_at_end and not at_end_of_word(chunk_size=2)):
+        elif next_2 in sound_dict.keys() and not (next_2 in ONLY_AT_END and not at_end_of_word(chunk_size=2)):
             output_text += next_2
             sound = sound_dict[next_2]
             skip = 1
@@ -411,7 +425,7 @@ for i, char in enumerate(input_chars):
             skip = 1
 
         # Multiple sound conditions
-        elif next_2 in multi_sound_conditions:
+        elif next_2 in MULTI_SOUND_CONDITIONS:
             # End of word:
             if at_end_of_word(chunk_size=2):
                 sound = sound_dict.get(f'{next_2}_end', None)    
