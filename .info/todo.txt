@@ -1,5 +1,5 @@
 TO DO
-- find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
+- split main.py into a functions.py and main.py, so that the functionality can be used for other projects but also you can run it on its own
 
 
 SO LOW PRIORITY THAT I'LL PROBABLY NOT DO IT

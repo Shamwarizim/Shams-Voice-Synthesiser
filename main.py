@@ -37,6 +37,10 @@ with open('.INPUT.json', 'r') as f:
 INPUT_STRING = settings['TEXT_TO_SPEAK']
 
 VOICE_NAME = settings['voice_folder_name']
+PLAYBACK_SPEED = settings['playback_speed']
+if PLAYBACK_SPEED < 1:
+    PLAYBACK_SPEED = 1
+
 USE_PKL = not settings['regenerate_sound_dictionary']
 
 SFX_ENABLED = settings['sfx_enabled']
@@ -468,7 +472,8 @@ for i, char_lowercase in enumerate(input_chars_lowercase):
 
 #######################################################################################
 
-#output_audio = speedup(output_audio, playback_speed=2)  # speedup via pydub is SUPER low quality, too much data loss
+if PLAYBACK_SPEED != 1:
+    output_audio = speedup(output_audio, playback_speed=PLAYBACK_SPEED)
 log.info('Complete. EXPORTING!')
 output_path = os.path.join(CURRENT_DIR, f"output.wav")
 output_audio.export(output_path, format="wav")
@@ -483,7 +488,6 @@ pygame.mixer.music.play()
 
 for text, length in zip(live_playback_text, live_playback_sound_lengths):
     print(text)
-    time.sleep(length)
-
+    time.sleep(length/PLAYBACK_SPEED)
 
 print('------ All done now :) ------')
