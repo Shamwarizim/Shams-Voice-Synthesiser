@@ -1,12 +1,12 @@
 {
-    "TEXT_TO_SPEAK": "Hello world. Programmed to work and not to feel.",
+    "TEXT_TO_SPEAK": "Hello world!",
 
-    "voice_folder_name": "sham_max",
+    "voice_folder_name": "emerald",
 
     
     "regenerate_sound_dictionary": false,
 
-    "sfx_enabled": false,
+    "sfx_enabled": true,
     "characters_that_play_sfx": ["*", "$"],
     "sfx_file_for_characters_to_use": ["bleep", "cash_register"],
 

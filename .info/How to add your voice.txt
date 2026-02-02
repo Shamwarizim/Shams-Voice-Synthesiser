@@ -4,7 +4,7 @@ HOW TO ADD YOUR VOICE TO LET IT BE SYNTHESISED
 
 Right so, you need to record individual sound files.
 Each file must be named what the list below names the sound or else you will cause issues. 
-Currently, the maximum sounds is 38, and the minimum is 15. So 60.53% of sounds are required.
+Currently, the maximum sounds is 38, and the minimum is 23. So 60.53% of sounds are required.
 The voice synth sounds a fair bit worse without the additional sounds, but the program can function without them.
 
 Important sidenote: Add a folder inside the voices folder with the name of your voice.
@@ -13,10 +13,11 @@ Important sidenote: Add a folder inside the voices folder with the name of your 
 
 BEFORE WE BEGIN:
 ‼️Note:
-1. Do not say the name of the letter. Say the soud it makes.
+1. Do not say the name of the letter. Say the sound it makes.
 2. It's very easy to add an 'uh' sound to the end of consonants like B becoming buh, or D to duh.
    So you must ensure you do not add extra sounds to the end or the resulting voice will sound bad.
    Also, make sure each letter is pronounced quickly. If it's too long, words will sound weird.
+3. For the best result, try to keep a similar pitch, volume, and stay monotone for each sound. The consistency helps it sounnd better. 
 
 
 Wherever there is an ❌ is a place you can ✅ once you record the sound.
