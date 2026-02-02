@@ -4,8 +4,8 @@
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
 from pydub.effects import speedup
-import winsound
-import io
+# python3 -m pip install pygame
+import pygame
 import logging as log
 log.basicConfig(format="[%(asctime)s] [%(filename)s/%(levelname)s]: %(message)s (Line: %(lineno)s)",
                     datefmt="%H:%M:%S",
@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import json
 import pickle
+import time
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -374,7 +375,7 @@ input_chars_lowercase = list(INPUT_STRING.lower())
 skip = 0
 output_text = ''
 live_playback_text = []
-live_playback_sound = []
+live_playback_sound_lengths = []
 for i, char_lowercase in enumerate(input_chars_lowercase):  
     if skip > 0:
         skip -= 1
@@ -456,7 +457,7 @@ for i, char_lowercase in enumerate(input_chars_lowercase):
     
     # OUTPUT
     output_audio += sound
-    live_playback_sound.append(sound)
+    live_playback_sound_lengths.append(sound.duration_seconds)
 
     if HIDE_VOWEL_TILDES:
         output_text = output_text.replace('a~', 'a').replace('e~', 'e').replace('i~', 'i').replace('o~', 'o').replace('u~', 'u')
@@ -469,18 +470,20 @@ for i, char_lowercase in enumerate(input_chars_lowercase):
 
 #output_audio = speedup(output_audio, playback_speed=2)  # speedup via pydub is SUPER low quality, too much data loss
 log.info('Complete. EXPORTING!')
-path = os.path.join(CURRENT_DIR, f"output.mp3")
-output_audio.export(path, format="mp3")
+output_path = os.path.join(CURRENT_DIR, f"output.wav")
+output_audio.export(output_path, format="wav")
 
 #########################################################################################
-
 print('COMMENCING LIVE PLAYBACK')
 
-for text, sound in zip(live_playback_text, live_playback_sound):
+# Play Exported Sound
+pygame.mixer.init()
+pygame.mixer.music.load(output_path)
+pygame.mixer.music.play()
+
+for text, length in zip(live_playback_text, live_playback_sound_lengths):
     print(text)
-    # Play Sound
-    wav = io.BytesIO()
-    sound.export(wav, format="wav")
-    winsound.PlaySound(wav.getvalue(), winsound.SND_MEMORY)
+    time.sleep(length)
+
 
 print('------ All done now :) ------')

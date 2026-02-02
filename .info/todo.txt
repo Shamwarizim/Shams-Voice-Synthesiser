@@ -1,6 +1,4 @@
 TO DO
-- overhaul live playback to use the exported audio but for text use a list of strings like before but also a list of ints of timings of when to change, theoretically this means there'll be no lag or jitter?
-
 - find a good module for audio speed up that works with pydub, cos pydub's one is far too low quality
 
 
