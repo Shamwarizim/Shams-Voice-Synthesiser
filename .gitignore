@@ -2,3 +2,4 @@ output.mp3
 test outputs/
 past_inputs.py
 pickles/sound_dict/
+__pycache__

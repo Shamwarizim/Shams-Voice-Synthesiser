@@ -1,7 +1,7 @@
 {
-    "TEXT_TO_SPEAK": "Hello~ world! The~ quick brown fox jumps o~ver the~ la~zy dog.",
+    "TEXT_TO_SPEAK": "Hello~ world! The~ quick brown fox jumps o~ver the~ la~zy dog. I'm just going to extend this text a bit - a tad - to get a better feel for how this sounds.",
 
-    "voice_folder_name": "sham_max",
+    "voice_folder_name": "emerald",
     "playback_speed": 1,
 
     

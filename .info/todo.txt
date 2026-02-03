@@ -1,5 +1,5 @@
 TO DO
-- split main.py into a functions.py and main.py, so that the functionality can be used for other projects but also you can run it on its own
+- Better/proper documentation for the attributes and functions of VoiceSynthesiser
 
 
 SO LOW PRIORITY THAT I'LL PROBABLY NOT DO IT
