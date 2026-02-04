@@ -26,7 +26,7 @@ vs.generate_audio(input_string = vs.INPUT_STRING_FROM_JSON, output_path_folder =
 # LIVE PLAYBACK
 print('COMMENCING LIVE PLAYBACK')
 
-for text in vs.live_playback():
-    print(text) # You can replace print() with whatever text display you want. vs.live_playback() handles the timings on it's own.
+for text in vs.live_playback(pre_concatenated_chunks=False): # pre_concatenated_chunks defaults to False. False: outputs individual newest chunk each time. True: outputs chunk concatenated to all previous chunks each time.
+    print(text, end='', flush=True) # You can replace print() with whatever text display you want. vs.live_playback() handles the timings on it's own.
 
-print('------ All done now :) ------')
+print('\n------ All done now :) ------')

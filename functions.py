@@ -411,7 +411,8 @@ class VoiceSynthesiser:
         # Build
         skip = 0
         output_text = ''
-        live_playback_text = []
+        live_playback_text_concatenated = []
+        live_playback_text_individual = []
         live_playback_sound_lengths = []
         for i, char_lowercase in enumerate(input_chars_lowercase):  
             if skip > 0:
@@ -498,7 +499,15 @@ class VoiceSynthesiser:
 
             if HIDE_VOWEL_TILDES:
                 output_text = output_text.replace('a~', 'a').replace('e~', 'e').replace('i~', 'i').replace('o~', 'o').replace('u~', 'u')
-            live_playback_text.append(output_text)
+            
+            # Live playback text
+            if live_playback_text_concatenated != []:
+                current_chunk = output_text.removeprefix( live_playback_text_concatenated[-1] ) # by removing prev output_text from beginning of current output_text we get the change
+            else:
+                current_chunk = output_text
+            live_playback_text_individual.append(current_chunk)
+
+            live_playback_text_concatenated.append(output_text)
         
         # Export
         if PLAYBACK_SPEED != 1:
@@ -508,11 +517,12 @@ class VoiceSynthesiser:
         output_audio.export(output_path_file, format="wav")
 
         self.output_path_file = output_path_file
-        self.live_playback_text = live_playback_text
+        self.live_playback_text_concatenated = live_playback_text_concatenated
+        self.live_playback_text_individual = live_playback_text_individual
         self.live_playback_sound_lengths = live_playback_sound_lengths
 
     # LIVE PLAYBACK (GENERATOR)
-    def live_playback(self):
+    def live_playback(self, pre_concatenated_chunks=False):
         if not hasattr(self, 'PLAYBACK_SPEED'):
             log.warning('Playback speed not defined, defaulting to 1.')
             playback_speed = 1
@@ -520,12 +530,12 @@ class VoiceSynthesiser:
             playback_speed = self.PLAYBACK_SPEED
         
         # Missing necessary attributes:
-        if (not hasattr(self, 'output_path_file')) or (not hasattr(self, 'live_playback_text')) or (not hasattr(self, 'live_playback_sound_lengths')):
+        if (not hasattr(self, 'output_path_file')) or (not hasattr(self, 'live_playback_text_concatenated')) or (not hasattr(self, 'live_playback_sound_lengths')):
             errorText = 'live_playback requires the class to have the following attributes which were not found:'
             if not hasattr(self, 'output_path_file'):
                 errorText += ' output_path_file'
-            if not hasattr(self, 'live_playback_text'):
-                errorText += ' live_playback_text'
+            if not hasattr(self, 'live_playback_text_concatenated'):
+                errorText += ' live_playback_text_concatenated'
             if not hasattr(self, 'live_playback_sound_lengths'):
                 errorText += ' live_playback_sound_lengths'
             raise Exception(errorText)
@@ -535,6 +545,11 @@ class VoiceSynthesiser:
         pygame.mixer.music.load(self.output_path_file)
         pygame.mixer.music.play()
 
-        for text, length in zip(self.live_playback_text, self.live_playback_sound_lengths):
+        if pre_concatenated_chunks:
+            text_list = self.live_playback_text_concatenated
+        else:
+            text_list = self.live_playback_text_individual
+
+        for text, length in zip(text_list, self.live_playback_sound_lengths):
             yield text
             time.sleep(length/playback_speed)
