@@ -390,9 +390,10 @@ class VoiceSynthesiser:
         if not hasattr(self, 'sound_dict'):
             raise Exception('Cannot generate audio without first loading the sound dictionary via load_sound_dictionary()')
         
-        if input_string is None and ( hasattr(self, 'INPUT_STRING_FROM_JSON') and self.INPUT_STRING_FROM_JSON is not None):
+        if input_string is None and hasattr(self, 'INPUT_STRING_FROM_JSON'):
             input_string = self.INPUT_STRING_FROM_JSON
-        else:
+            
+        if input_string is None and ( (not hasattr(self, 'INPUT_STRING_FROM_JSON')) or (self.INPUT_STRING_FROM_JSON is None) ):
             raise Exception('No input string provided either from JSON or in the function.')
         
         PLAYBACK_SPEED = self.PLAYBACK_SPEED
