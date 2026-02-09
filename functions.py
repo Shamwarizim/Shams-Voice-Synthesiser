@@ -114,9 +114,9 @@ class VoiceSynthesiser:
             # SILENCES
             # AudioSegment.silent's duration field is in milliseconds (1s = 1000ms)
             #0
-            sound_dict['~'] = AudioSegment.silent(duration=0)
+            sound_dict['~', '"', "'", "’"] = AudioSegment.silent(duration=0)
             #50
-            for char in ['(', ')', '[', ']', '{', '}', ':', ';', '"', "'"]: sound_dict[char] = AudioSegment.silent(duration=50)
+            for char in ['(', ')', '[', ']', '{', '}', ':', ';']: sound_dict[char] = AudioSegment.silent(duration=50)
             #100
             for char in [' ', '-']: sound_dict[char] = AudioSegment.silent(duration=100)
             #200
