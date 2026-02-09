@@ -396,6 +396,11 @@ class VoiceSynthesiser:
         if input_string is None and ( (not hasattr(self, 'INPUT_STRING_FROM_JSON')) or (self.INPUT_STRING_FROM_JSON is None) ):
             raise Exception('No input string provided either from JSON or in the function.')
         
+        # Unload pygame for next playback if necessary        
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+            pygame.mixer.music.unload()
+        
         PLAYBACK_SPEED = self.PLAYBACK_SPEED
         USE_PKL = self.USE_PKL
         SFX_ENABLED = self.SFX_ENABLED
