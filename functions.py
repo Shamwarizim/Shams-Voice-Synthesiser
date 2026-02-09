@@ -58,16 +58,19 @@ class VoiceSynthesiser:
         self.INPUT_STRING_FROM_JSON = settings.get('TEXT_TO_SPEAK', None)
         self.VOICE_NAME_FROM_JSON = settings.get('voice_folder_name', None)
 
-        self.PLAYBACK_SPEED = settings['playback_speed']
+        self.PLAYBACK_SPEED = settings.get('playback_speed', 1)
         if self.PLAYBACK_SPEED < 1:
             self.PLAYBACK_SPEED = 1
 
-        self.USE_PKL = not settings['regenerate_sound_dictionary']
+        not_use_pkl = settings.get('regenerate_sound_dictionary', False)
+        self.USE_PKL = not not_use_pkl
 
-        self.SFX_ENABLED = settings['sfx_enabled']
-        self.SFX_DICT = dict(zip(settings['characters_that_play_sfx'], settings['sfx_file_for_characters_to_use']))
+        self.SFX_ENABLED = settings.get('sfx_enabled', False)
 
-        self.HIDE_VOWEL_TILDES = settings['hide_tildes_denoting_long_vowels_in_text_output']
+        if self.SFX_ENABLED:
+            self.SFX_DICT = dict(zip(settings['characters_that_play_sfx'], settings['sfx_file_for_characters_to_use']))
+
+        self.HIDE_VOWEL_TILDES = settings.get('hide_tildes_denoting_long_vowels_in_text_output', True)
     
     # LOAD SOUND DICT
     def load_sound_dictionary(self, pkl_path=None):
