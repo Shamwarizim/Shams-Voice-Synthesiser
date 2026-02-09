@@ -386,9 +386,14 @@ class VoiceSynthesiser:
         self.sound_dict = sound_dict
 
     # GENERATE AUDIO  
-    def generate_audio(self, input_string, output_path_folder, output_name='output'):
+    def generate_audio(self, output_path_folder, output_name='output', input_string=None):
         if not hasattr(self, 'sound_dict'):
             raise Exception('Cannot generate audio without first loading the sound dictionary via load_sound_dictionary()')
+        
+        if input_string is None and ( hasattr(self, 'INPUT_STRING_FROM_JSON') and self.INPUT_STRING_FROM_JSON is not None):
+            input_string = self.INPUT_STRING_FROM_JSON
+        else:
+            raise Exception('No input string provided either from JSON or in the function.')
         
         PLAYBACK_SPEED = self.PLAYBACK_SPEED
         USE_PKL = self.USE_PKL

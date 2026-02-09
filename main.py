@@ -20,7 +20,9 @@ pkl_path = os.path.join(SOUND_DICT_PKL_PATH, f'{vs.VOICE_NAME}.pkl') # vs.VOICE_
 vs.load_sound_dictionary(pkl_path=pkl_path)
 
 # GENERATE AUDIO
-vs.generate_audio(input_string = vs.INPUT_STRING_FROM_JSON, output_path_folder = CURRENT_DIR, output_name = 'output') # output_name defaults to 'output', but I've manually set it as an example.
+vs.generate_audio(input_string = vs.INPUT_STRING_FROM_JSON, output_path_folder = CURRENT_DIR, output_name = 'output')
+# input_string defaults to INPUT_STRING_FROM_JSON but this is how to set one not from JSON. If nothing from JSON or from here is provided an error is raised.
+# output_name defaults to 'output', but I've manually set it as an example.
 
     
 # LIVE PLAYBACK
